@@ -5,7 +5,7 @@ An IDA Pro script to update native addresses for new versions. Check out the Ghi
 Rockstar randomizes native hashes every GTA V version. Modding tools need these new hashes to determine what address to call for a given native function. This IDA script will generate `natives.h` for any new version of GTA V to be used in projects like [Native Caller](https://github.com/2much4u/PS4-GTA-V-Native-Caller) or [Menu Base](https://github.com/2much4u/PS4-GTA-V-Menu-Base). You can read more about what natives are and why they are useful in the `README` for [Native Caller](https://github.com/2much4u/PS4-GTA-V-Native-Caller).
 
 ## Usage
-### 1. Load GTA V EBOOT into IDA Pro (7.0+)
+### 1. Load GTA V EBOOT into IDA Pro (7.0+) (7.4+)
 ### 2. Select File -> Script File and select this script
 ### 3. Select a crossmap file
 A crossmap file is a text file representing a map from a previous GTA V version's native hashes to a new version's native hashes. These can commonly be found online with a quick Google search for any version of GTA V. The file format is expected to be:
