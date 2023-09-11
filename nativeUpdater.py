@@ -31,7 +31,7 @@ systemNatives = [
 
 # Read crossmap file into dictionary
 def parseCrossmap():
-    fileName = AskFile(False, "", "Choose a crossmap file")
+    fileName = ida_kernwin.ask_file(0, "*.h", "Choose a crossmap file")
     file = open(fileName, "r")
 
     raw_lines = file.readlines()
@@ -60,15 +60,15 @@ def findNativeFunctions():
 
         # Start at xref to function and work backwards
         while True:
-            addr = PrevHead(addr)
-            if GetMnem(addr) == "mov":
-                opnd = GetOpnd(addr, 0)
+            addr = prev_head(addr)
+            if print_insn_mnem(addr) == "mov":
+                opnd = print_operand(addr, 0)
                 if "edi" in opnd or "rdi" in opnd:
                     break
 
         # Function address is always the line before the hash
-        hash = GetOperandValue(addr, 1)
-        func = GetOperandValue(PrevHead(addr), 1)
+        hash = get_operand_value(addr, 1)
+        func = get_operand_value(prev_head(addr), 1)
         functionMap[hash] = func
         nativeCount += 1
     
@@ -97,10 +97,10 @@ def findSystemNatives(mergedMap):
     addr = registerNative
     registerNativeInTable = 0
     while True:
-        if GetMnem(addr) == "jmp":
-            registerNativeInTable = GetOperandValue(addr, 0)
+        if print_insn_mnem(addr) == "jmp":
+            registerNativeInTable = get_operand_value(addr, 0)
             break
-        addr = NextHead(addr)
+        addr = next_head(addr)
     
     # Search xrefs to registerNativeInTable
     for xref in XrefsTo(registerNativeInTable):
@@ -110,23 +110,23 @@ def findSystemNatives(mergedMap):
         hash = 0
         function = 0
         while True:
-            addr = PrevHead(addr)
+            addr = prev_head(addr)
 
             if hash != 0 and function != 0:
                 break
 
-            if GetMnem(addr) == "mov" and hash == 0:
-                opnd = GetOpnd(addr, 0)
+            if print_insn_mnem(addr) == "mov" and hash == 0:
+                opnd = print_operand(addr, 0)
                 if "esi" in opnd or "rsi" in opnd:
-                    hash = GetOperandValue(addr, 1)
+                    hash = get_operand_value(addr, 1)
                     if hash not in systemNatives:
                         hash = 0
                         break
 
-            if GetMnem(addr) == "lea" and function == 0:
-                opnd = GetOpnd(addr, 0)
+            if print_insn_mnem(addr) == "lea" and function == 0:
+                opnd = print_operand(addr, 0)
                 if "rdx" in opnd:
-                    function = GetOperandValue(addr, 1)
+                    function = get_operand_value(addr, 1)
 
         if hash != 0:
             mergedMap[hash] = function
@@ -135,7 +135,7 @@ def findSystemNatives(mergedMap):
 
 # Overwrite native hashes in clean header with function addresses
 def createHeader(mergedMap):
-    fileName = AskFile(False, "", "Choose a native header file")
+    fileName = ida_kernwin.ask_file(0, "*.h", "Choose a native header file")
     file = open(fileName, "r")
     raw_lines = file.readlines()
 
